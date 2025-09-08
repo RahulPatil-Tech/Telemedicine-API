@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://rp32:Strong%40123@db:5432/telemedicine_db
+      - SECRET_KEY=a_strong_and_random_fallback_secret_key
+      - JWT_SECRET_KEY=a_different_strong_and_random_jwt_key
+    depends_on:
+      - db
+    command: gunicorn --workers 1 --bind 0.0.0.0:5000 --worker-class eventlet app:socketio
+
+  db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=rp32
+      - POSTGRES_PASSWORD=Strong%40123
+      - POSTGRES_DB=telemedicine_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
